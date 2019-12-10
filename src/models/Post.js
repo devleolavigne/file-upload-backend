@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
-const aws = require('aws-sdk');
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
+const mongoose = require('mongoose')
+const aws = require('aws-sdk')
+const fs = require('fs')
+const path = require('path')
+const { promisify } = require('util')
 
-const s3 = new aws.S3();
+const s3 = new aws.S3()
 
 const postSchema = new mongoose.Schema({
   name: String,
@@ -13,15 +13,15 @@ const postSchema = new mongoose.Schema({
   url: String,
   createdAt: {
     type: Date,
-    default: Date.now,
-  },
-});
+    default: Date.now
+  }
+})
 
 postSchema.pre('save', function () {
   if (!this.url) {
     this.url = `${process.env.APP_URL}/files/${this.key}`
   }
-});
+})
 
 postSchema.pre('remove', function () {
   if (process.env.STORAGE_TYPE === 's3') {
@@ -32,8 +32,8 @@ postSchema.pre('remove', function () {
   } else {
     return promisify(fs.unlink)(
       path.resolve(__dirname, '..', '..', 'tmp', 'uploads', this.key)
-    );
+    )
   }
-});
+})
 
-module.exports = mongoose.model('Post', postSchema);
+module.exports = mongoose.model('Post', postSchema)
